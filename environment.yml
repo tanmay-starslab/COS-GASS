@@ -1,0 +1,18 @@
+# environment.yml
+name: cosgass
+channels:
+  - conda-forge
+dependencies:
+  - python=3.13
+  - numpy
+  - scipy
+  - pandas
+  - astropy
+  - h5py
+  - matplotlib
+  - yt
+  - jupyterlab
+  - pip
+  - pip:
+      - trident
+      - scida
