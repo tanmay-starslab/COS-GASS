@@ -1,9 +1,8 @@
-# environment.yml
 name: cosgass
 channels:
   - conda-forge
 dependencies:
-  - python=3.13
+  - python=3.12
   - numpy
   - scipy
   - pandas
@@ -16,3 +15,4 @@ dependencies:
   - pip:
       - trident
       - scida
+      - "illustris-python @ git+https://github.com/illustristng/illustris_python.git"
