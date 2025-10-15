@@ -1,0 +1,8 @@
+[2025-10-15 11:38:03] Loading cutout: /Users/tsingh65/ASU Dropbox/Tanmay Singh/COS_GASS/TNG_Subhalos/sub_563732/cutout_ALLFIELDS_sphere_2p1Rvir_sub563732.hdf5
+[2025-10-15 11:38:05] Loaded ds: cutout_ALLFIELDS_sphere_2p1Rvir_sub563732
+[2025-10-15 11:38:05] Domain left/right edge (code_length): [0. 0. 0.] code_length, [35000. 35000. 35000.] code_length
+[2025-10-15 11:38:05] Domain width (kpc): [51668.1499159 51668.1499159 51668.1499159] kpc
+[2025-10-15 11:38:05] cutout center (ckpc/h): [23253.   17960.3   8687.82]
+[2025-10-15 11:38:05] yt.load() took 2.19 s
+[2025-10-15 11:38:05] Adding ion fields (Trident)…
+[2025-10-15 11:38:07] add_ion_fields() took 1.96 s

@@ -1,0 +1,31 @@
+[2025-10-15 11:40:35] Loading cutout: /Users/tsingh65/ASU Dropbox/Tanmay Singh/COS_GASS/TNG_Subhalos/sub_563732/cutout_ALLFIELDS_sphere_2p1Rvir_sub563732.hdf5
+[2025-10-15 11:40:35] Loaded ds: cutout_ALLFIELDS_sphere_2p1Rvir_sub563732
+[2025-10-15 11:40:35] Domain left/right edge (code_length): [0. 0. 0.] code_length, [35000. 35000. 35000.] code_length
+[2025-10-15 11:40:35] Domain width (kpc): [51668.1499159 51668.1499159 51668.1499159] kpc
+[2025-10-15 11:40:35] cutout center (ckpc/h): [23253.   17960.3   8687.82]
+[2025-10-15 11:40:35] yt.load() took 0.07 s
+[2025-10-15 11:40:35] Adding ion fields (Trident)…
+[2025-10-15 11:40:35] add_ion_fields() took 0.42 s
+[2025-10-15 11:40:35] Endpoints (as read, ckpc/h): p0=[23096.88959915 18198.93630021  8728.64307649], p1=[23191.99409511 17786.65207354  8466.21154712]
+[2025-10-15 11:40:35] Endpoints (code_length, wrapped): p0=[23096.88959915 18198.93630021  8728.64307649], p1=[23191.99409511 17786.65207354  8466.21154712]
+[2025-10-15 11:40:35] Endpoints inside domain? p0=True, p1=True
+[2025-10-15 11:40:35] Making ray with trident.make_simple_ray()
+[2025-10-15 11:40:37] Ray build took 1.19 s → /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/ray/ray_alpha180_unflipped.h5
+[2025-10-15 11:40:37] [ray] N_cells = 358
+[2025-10-15 11:40:37] Making spectrum (COS-G130M) for ['H I 1216', 'C II 1335', 'Si III 1206']
+[2025-10-15 11:40:37] Spectrum took 0.07 s
+[2025-10-15 11:40:37] [saved] /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/ray/spectrum_full_alpha180_unflipped.png
+[2025-10-15 11:40:37] [saved] /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/ray/spectrum_zooms_alpha180_unflipped.png
+[2025-10-15 11:40:42] [proj] saved /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/proj/proj_HI_x_4Rvir_native.png
+[2025-10-15 11:40:45] [proj] saved /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/proj/proj_HI_y_4Rvir_native.png
+[2025-10-15 11:40:48] [proj] saved /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/proj/proj_HI_z_4Rvir_native.png
+[2025-10-15 11:40:51] [proj] saved /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/proj/proj_HI_los_4Rvir_native.png
+[2025-10-15 11:40:54] [proj] saved /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/proj/proj_CII_x_4Rvir_native.png
+[2025-10-15 11:40:57] [proj] saved /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/proj/proj_CII_y_4Rvir_native.png
+[2025-10-15 11:41:02] [proj] saved /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/proj/proj_CII_z_4Rvir_native.png
+[2025-10-15 11:41:06] [proj] saved /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/proj/proj_CII_los_4Rvir_native.png
+[2025-10-15 11:41:09] [proj] saved /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/proj/proj_SiIII_x_4Rvir_native.png
+[2025-10-15 11:41:12] [proj] saved /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/proj/proj_SiIII_y_4Rvir_native.png
+[2025-10-15 11:41:16] [proj] saved /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/proj/proj_SiIII_z_4Rvir_native.png
+[2025-10-15 11:41:19] [proj] saved /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/proj/proj_SiIII_los_4Rvir_native.png
+[2025-10-15 11:41:19] [debug] /Users/tsingh65/github_repos/COS-GASS//tests/56372_sightlines/results_563732/debug/endpoints_preview.png
