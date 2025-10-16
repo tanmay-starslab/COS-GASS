@@ -15,6 +15,7 @@ notebooks/y/
 *.h5
 *.hdf5
 *.fits
+*.pdf
 outputs/
 logs/
 .ipynb_checkpoints/
