@@ -1,0 +1,73 @@
+{
+  "SID": 563732,
+  "SNAP": 99,
+  "h": 0.6774,
+  "BoxSize_ckpc_h": 35000.0,
+  "center_ckpc_h": [
+    23253.017578125,
+    17960.3046875,
+    8687.81640625
+  ],
+  "rhalf_star_ckpc_h": 3.5811498165130615,
+  "inc_deg": 76.07,
+  "rho_kpc": 214.0,
+  "phi_deg": 45.0,
+  "Rvir_kpc": 245.0,
+  "R_base_noflip": [
+    [
+      0.9774117963572083,
+      0.08102284630867612,
+      -0.19519600077310964
+    ],
+    [
+      -0.16995025850683143,
+      0.8503400267562937,
+      -0.4980348868599137
+    ],
+    [
+      0.12563076842571785,
+      0.5199587842051968,
+      0.8449022267414243
+    ]
+  ],
+  "R_base_flip": [
+    [
+      0.8783529823480489,
+      0.4363422506272715,
+      0.19519600077310967
+    ],
+    [
+      0.29449880500928644,
+      -0.8156173767879983,
+      0.49803488685991354
+    ],
+    [
+      0.376518913533425,
+      -0.3799654392165056,
+      -0.8449022267414245
+    ]
+  ],
+  "v3_hat_native": [
+    0.1951960007731096,
+    -0.7001590662458388,
+    0.6867865776468985
+  ],
+  "v3_hat_native_flip": [
+    -0.1951960007731096,
+    0.7001590662458388,
+    -0.6867865776468985
+  ],
+  "conventions": {
+    "native_to_obs": "X_obs = X_nat @ R_cur.T",
+    "obs_to_native": "v_nat = v_obs @ R_cur",
+    "normal_nat": "ez_obs @ R_cur",
+    "north_nat": "ey_obs @ R_cur",
+    "alpha_rotation": "R_cur = R_base @ Rodrigues(axis=v3_hat_mode, theta=alpha)"
+  },
+  "units": {
+    "positions_saved": "ckpc/h (code_length)",
+    "los_vectors": "dimensionless unit vectors in native coords",
+    "rho_input": "kpc (for plots); for rays use rho_ckpc_h = rho_kpc*h",
+    "width_depth_plots": "kpc (plots only)"
+  }
+}
