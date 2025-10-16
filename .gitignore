@@ -14,3 +14,9 @@ tests/**/y/
 notebooks/y/
 *.h5
 *.hdf5
+*.fits
+outputs/
+logs/
+.ipynb_checkpoints/
+__pycache__/
+.DS_Store
