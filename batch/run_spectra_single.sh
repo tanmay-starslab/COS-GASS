@@ -21,6 +21,9 @@ conda activate trident
 
 export LD_LIBRARY_PATH="$CONDA_PREFIX/lib:${LD_LIBRARY_PATH:-}"
 export PATH="$CONDA_PREFIX/bin:$PATH"
+# HDF5 on shared FS: avoid flaky locks/version checks
+export HDF5_USE_FILE_LOCKING=FALSE
+export HDF5_DISABLE_VERSION_CHECK=2
 unset PYTHONPATH || true
 export PYTHONNOUSERSITE=1
 export MPLBACKEND=Agg

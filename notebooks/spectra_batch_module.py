@@ -66,6 +66,45 @@ class JobParams:
     filter_mode: Optional[str] = None     # "noflip" | "flip" | None
     verbose: bool = True
 
+
+
+# -------------------------
+# saving helpers
+# -------------------------
+import time, tempfile, errno, random
+
+def is_valid_h5(path: str) -> bool:
+    try:
+        import h5py, os
+        if not os.path.exists(path): return False
+        if os.path.getsize(path) == 0: return False
+        if not h5py.is_hdf5(path): return False
+        with h5py.File(path, "r"):
+            return True
+    except Exception:
+        return False
+
+def atomic_write_h5(target_path: str, write_fn):
+    """
+    Write to a temp file in the SAME directory, fsync, then atomic rename.
+    write_fn(file_handle) should populate the file_handle (already open in 'w').
+    """
+    d = os.path.dirname(target_path)
+    os.makedirs(d, exist_ok=True)
+    base = os.path.basename(target_path)
+    tmp_fd, tmp_path = tempfile.mkstemp(prefix=f".{base}.tmp.", dir=d)
+    os.close(tmp_fd)
+    try:
+        with h5py.File(tmp_path, "w", libver="latest") as f:
+            write_fn(f)
+            f.flush()
+            try: os.fsync(f.id.get_vfd_handle())  # best-effort; may not exist on some builds
+            except Exception: pass
+        os.replace(tmp_path, target_path)  # atomic on same filesystem
+    finally:
+        try: os.remove(tmp_path)
+        except FileNotFoundError: pass
+        
 # -------------------------
 # yt / trident helpers
 # -------------------------
@@ -338,24 +377,62 @@ def _write_ray_pack_into_group(groot, meta, ray, spec, cols):
             continue
         g_ft = gfields.require_group(str(ftype))
         _save_dataset_with_unit(g_ft, str(fname), arr, preferred_units=PREFERRED_UNITS)
-
+    
+    
 def save_bundle_hdf5(out_path, meta, ray, spec, cols):
-    ensure_dir(os.path.dirname(out_path))
-    with h5py.File(out_path, "w") as f:
+    def _writer(f):
         _write_ray_pack_into_group(f, meta, ray, spec, cols)
+    atomic_write_h5(out_path, _writer)
     print("[SAVED]", out_path)
 
-def append_to_combined(agg_path, group_path, meta, ray, spec, cols, globals_once: Dict):
+def append_to_combined(agg_path, group_path, meta, ray, spec, cols, globals_once, max_retries: int = 3):
     ensure_dir(os.path.dirname(agg_path))
-    with h5py.File(agg_path, "a") as f:
-        if "globals" not in f:
+
+    # If file exists but is corrupt, recreate fresh.
+    if os.path.exists(agg_path) and not is_valid_h5(agg_path):
+        print(f"[WARN] Combined file corrupt/non-HDF5. Recreating: {agg_path}")
+        os.remove(agg_path)
+
+    # Ensure it exists as a valid empty HDF5 (so later 'a' is sane)
+    if not os.path.exists(agg_path):
+        def _init_writer(f):
             g = f.create_group("globals")
             for k, v in globals_once.items():
                 try: g.attrs[k] = v
                 except TypeError: g.attrs[k] = json.dumps(v)
-        base = f.require_group(group_path)
-        _write_ray_pack_into_group(base, meta, ray, spec, cols)
-    print("[APPEND]", agg_path, "::", group_path)
+        atomic_write_h5(agg_path, _init_writer)
+
+    # retry append (transient FS errors)
+    for attempt in range(1, max_retries + 1):
+        try:
+            with h5py.File(agg_path, "a", libver="latest") as f:
+                if "globals" not in f:
+                    g = f.create_group("globals")
+                    for k, v in globals_once.items():
+                        try: g.attrs[k] = v
+                        except TypeError: g.attrs[k] = json.dumps(v)
+                base = f.require_group(group_path)
+                _write_ray_pack_into_group(base, meta, ray, spec, cols)
+            print("[APPEND]", agg_path, "::", group_path)
+            return
+        except OSError as e:
+            msg = str(e)
+            print(f"[WARN] append_to_combined attempt {attempt} failed: {msg}")
+            time.sleep(0.5 + random.random())
+            # If file turned corrupt mid-run, nuke & re-init once
+            if not is_valid_h5(agg_path) and attempt < max_retries:
+                try:
+                    os.remove(agg_path)
+                    print(f"[WARN] Removed corrupt {agg_path}; reinitializing.")
+                    def _init_writer(f):
+                        g = f.create_group("globals")
+                        for k, v in globals_once.items():
+                            try: g.attrs[k] = v
+                            except TypeError: g.attrs[k] = json.dumps(v)
+                    atomic_write_h5(agg_path, _init_writer)
+                except Exception as ee:
+                    print(f"[WARN] Could not remove/reinit {agg_path}: {ee}")
+    raise RuntimeError(f"append_to_combined: failed after {max_retries} attempts for {agg_path}")
 
 # -------------------------
 # Core processing
