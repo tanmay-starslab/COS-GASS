@@ -1,7 +1,7 @@
 #!/bin/bash
-#SBATCH --job-name=spec_arr
-#SBATCH --output=spec_arr_%A_%a.out
-#SBATCH --error=spec_arr_%A_%a.err
+#SBATCH --chdir=/scratch/tsingh65/TNG50-1_snap99
+#SBATCH --output=/scratch/tsingh65/TNG50-1_snap99/logs/spec_arr_%A_%a.out
+#SBATCH --error=/scratch/tsingh65/TNG50-1_snap99/logs/spec_arr_%A_%a.err
 #SBATCH --partition=general
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
