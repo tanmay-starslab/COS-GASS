@@ -117,7 +117,7 @@ def add_ions(ds):
     except Exception as e:
         print("[WARN] add_ion_fields:", e)
 
-def make_ray(ds, p0_ckpch, p1_ckpch):
+def make_ray(ds, p0_ckpch, p1_ckpch, data_filename=None, solution_filename=None):
     sp = ds.arr(p0_ckpch, "code_length")
     ep = ds.arr(p1_ckpch, "code_length")
     print(f"[RAY] Start (code_length): {sp}")
@@ -138,7 +138,13 @@ def make_ray(ds, p0_ckpch, p1_ckpch):
         ("gas", "Si_p2_number_density"),
         ("gas", "H_number_density"),
     ]
-    ray = trident.make_simple_ray(ds, start_position=sp, end_position=ep, fields=fields, ftype="gas")
+    ray = trident.make_simple_ray(ds, 
+                                  start_position=sp, 
+                                  end_position=ep, 
+                                  fields=fields, 
+                                  ftype="gas", 
+                                  data_filename=data_filename, 
+                                  solution_filename=solution_filename)
     ad = ray.all_data()
     nseg = ad[('gas','density')].size
     geom_len_ckpch = np.sqrt(((p1_ckpch - p0_ckpch)**2).sum())
@@ -484,6 +490,23 @@ def process_run_for_sid(
                         SNAP=int(snap),
                         instrument=str(cfg.instrument),
                         lines=json.dumps(list(cfg.lines)))
+    
+    
+    # one scratch location per subhalo task
+    ray_scratch_dir = os.environ.get("SLURM_TMPDIR")
+    if not ray_scratch_dir:
+        # fall back to a subhalo-local tmp dir so tasks don't collide
+        ray_scratch_dir = os.path.join(paths.rays_base, "_tmp_trident")
+    os.makedirs(ray_scratch_dir, exist_ok=True)
+
+    # a single (reused) filename for every sightline of this SID
+    rayfile  = os.path.join(ray_scratch_dir, f"ray_sid{sid}.h5")
+    trajfile = os.path.join(ray_scratch_dir, f"traj_sid{sid}.txt")
+
+    # start clean
+    for p in (rayfile, trajfile):
+        try: os.remove(p)
+        except FileNotFoundError: pass
 
     for i, row in df.iterrows():
         try:
@@ -508,7 +531,13 @@ def process_run_for_sid(
             if verbose:
                 print(f"\n[{i+1}/{len(df)}] {run_label} Processing {tag} ...")
 
-            ray  = make_ray(ds, p0, p1)
+            # AFTER (reuse the same file for this SID):
+            # (optionally delete to ensure a fresh write each time)
+            for p in (rayfile, trajfile):
+                try: os.remove(p)
+                except FileNotFoundError: pass
+
+            ray = make_ray(ds, p0, p1, data_filename=rayfile, solution_filename=trajfile)
             cols = compute_columns(ray, p0, p1)
             spec = build_spectrum(ray, cfg.lines, instr=cfg.instrument)
 
