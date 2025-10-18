@@ -391,7 +391,10 @@ def save_bundle_hdf5(out_path, meta, ray, spec, cols):
     atomic_write_h5(out_path, _writer)
     print("[SAVED]", out_path)
 
-def append_to_combined(agg_path, group_path, meta, ray, spec, cols, globals_once, max_retries: int = 3):
+def append_to_combined(agg_path, group_path, meta, ray, spec, cols,
+                       globals_once, max_retries: int = 3):
+    import time
+
     ensure_dir(os.path.dirname(agg_path))
 
     # If file exists but is corrupt, recreate fresh.
@@ -399,7 +402,7 @@ def append_to_combined(agg_path, group_path, meta, ray, spec, cols, globals_once
         print(f"[WARN] Combined file corrupt/non-HDF5. Recreating: {agg_path}")
         os.remove(agg_path)
 
-    # Ensure it exists as a valid empty HDF5 (so later 'a' is sane)
+    # Ensure a valid container exists
     if not os.path.exists(agg_path):
         def _init_writer(f):
             g = f.create_group("globals")
@@ -408,7 +411,9 @@ def append_to_combined(agg_path, group_path, meta, ray, spec, cols, globals_once
                 except TypeError: g.attrs[k] = json.dumps(v)
         atomic_write_h5(agg_path, _init_writer)
 
-    # retry append (transient FS errors)
+    # resume policy via env (default = overwrite)
+    policy = os.environ.get("SPECTRA_RESUME", "overwrite").lower()   # overwrite|skip
+
     for attempt in range(1, max_retries + 1):
         try:
             with h5py.File(agg_path, "a", libver="latest") as f:
@@ -417,15 +422,24 @@ def append_to_combined(agg_path, group_path, meta, ray, spec, cols, globals_once
                     for k, v in globals_once.items():
                         try: g.attrs[k] = v
                         except TypeError: g.attrs[k] = json.dumps(v)
-                base = f.require_group(group_path)
+
+                # handle prior writes
+                if group_path in f:
+                    if policy == "skip":
+                        print(f"[SKIP] {group_path} already present in {agg_path}")
+                        return
+                    print(f"[INFO] Replacing existing group: {group_path}")
+                    del f[group_path]   # clear old partial/previous write
+
+                base = f.create_group(group_path)
                 _write_ray_pack_into_group(base, meta, ray, spec, cols)
+
             print("[APPEND]", agg_path, "::", group_path)
             return
+
         except OSError as e:
-            msg = str(e)
-            print(f"[WARN] append_to_combined attempt {attempt} failed: {msg}")
-            time.sleep(0.5 + random.random())
-            # If file turned corrupt mid-run, nuke & re-init once
+            print(f"[WARN] append_to_combined attempt {attempt} failed: {e}")
+            time.sleep(0.5)
             if not is_valid_h5(agg_path) and attempt < max_retries:
                 try:
                     os.remove(agg_path)
@@ -438,6 +452,7 @@ def append_to_combined(agg_path, group_path, meta, ray, spec, cols, globals_once
                     atomic_write_h5(agg_path, _init_writer)
                 except Exception as ee:
                     print(f"[WARN] Could not remove/reinit {agg_path}: {ee}")
+
     raise RuntimeError(f"append_to_combined: failed after {max_retries} attempts for {agg_path}")
 
 # -------------------------
