@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=10G
 #SBATCH --time=2-12:00:00
-#SBATCH --array=1-1  # <-- set at submission time
+#SBATCH --array=1-20  # <-- set at submission time
 
 set -euo pipefail
 
@@ -34,7 +34,7 @@ export NUMEXPR_NUM_THREADS=${SLURM_CPUS_PER_TASK}
 export PYTHONPATH="/home/tsingh65/COS-GASS/notebooks:${PYTHONPATH:-}"
 
 ROOT="/scratch/tsingh65/TNG50-1_snap99"
-SID_LIST="/home/tsingh65/COS-GASS/data/sids_with_inc.txt"
+SID_LIST="/home/tsingh65/COS-GASS/data/sids_with_inc_run2.txt"
 
 # map array index -> line (skip blank/comment lines)
 SID="$(sed -n "${SLURM_ARRAY_TASK_ID}p" "$SID_LIST" | tr -d '[:space:]')"
